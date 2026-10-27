@@ -21,21 +21,23 @@
   <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
 
-  <!-- Stylesheet (version tagged) -->
-  <link rel="stylesheet" href="./style.css?v=1.00" />
+  <!-- Stylesheet (version-tagged to bust cache) -->
+  <link rel="stylesheet" href="./style.css?v=1.01" />
 
-  <!-- Primary CDN for PDF-Lib -->
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
+  <!-- 1. Check if user saved pdf-lib locally (100% offline) -->
+  <script src="./pdf-lib.min.js"></script>
 
-  <!-- Automatic Backup CDN Fallbacks -->
+  <!-- 2. Primary Fast CDN: Cloudflare cdnjs (Unblocked & ultra-fast) -->
   <script>
     if (!window.PDFLib) {
-      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"><\/script>');
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"><\/script>');
     }
   </script>
+
+  <!-- 3. Secondary Backup CDN: UNPKG -->
   <script>
     if (!window.PDFLib) {
-      document.write('<script src="https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js"><\/script>');
+      document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');
     }
   </script>
 </head>
@@ -55,7 +57,7 @@
           <div class="brand-text">
             <div class="title-with-badge">
               <h1>Manual Duplex PDF</h1>
-              <span class="version-badge" id="app-version-badge">v1.00</span>
+              <span class="version-badge" id="app-version-badge">v1.01</span>
             </div>
             <p>Print double-sided documents using your single-sided printer.</p>
           </div>
@@ -304,7 +306,7 @@
           100% Client-Side Privacy: Your PDF is processed locally on this device. Files are never uploaded to any server.
         </p>
         <div class="footer-bottom-row">
-          <span>Manual Duplex PDF &bull; v1.00 &bull; Offline Capable</span>
+          <span>Manual Duplex PDF &bull; v1.01 &bull; Offline Capable</span>
           <button id="force-cache-clear-btn" class="cache-reset-link" title="Wipes all caches and forces a clean reload">
             Reset Cache / Update App
           </button>
@@ -313,7 +315,7 @@
     </footer>
   </div>
 
-  <!-- Application Logic (version-tagged) -->
-  <script src="./app.js?v=1.00"></script>
+  <!-- Application Logic (version-tagged to bust cache) -->
+  <script src="./app.js?v=1.01"></script>
 </body>
 </html>
