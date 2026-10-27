@@ -1,14 +1,17 @@
 /**
  * Manual Duplex PDF - Service Worker
- * Strategy: Cache First for core assets and external PDF library, Network Fallback.
- * Ensures complete offline operation without caching sensitive user PDF documents.
+ * Version: 1.00
+ * Anti-Hoarding Strategy:
+ *  - Network-First for App Shell (HTML, CSS, JS) -> Always pulls fresh code when online
+ *  - Cache-First for external library CDNs
+ *  - Immediate cache wiping on version increment
  */
 
 'use strict';
 
-const CACHE_NAME = 'duplex-pdf-v1.0.0';
+const SW_VERSION = '1.00';
+const CACHE_NAME = `duplex-pdf-v${SW_VERSION}`;
 
-// Essential application shell and vendor library assets
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -21,94 +24,95 @@ const PRECACHE_ASSETS = [
   'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js'
 ];
 
-// Install Event: Precaches application shell
+// Install: Activate immediately without waiting
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(async (cache) => {
-        // Cache assets gracefully so that a missing optional asset doesn't abort installation
-        const cachePromises = PRECACHE_ASSETS.map(async (url) => {
-          try {
-            const response = await fetch(url, { mode: url.startsWith('http') ? 'cors' : 'no-cors' });
-            if (response.ok || response.type === 'opaque') {
-              await cache.put(url, response);
-            }
-          } catch (err) {
-            console.warn(`[Service Worker] Pre-cache skipped for: ${url}`, err);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const cachePromises = PRECACHE_ASSETS.map(async (url) => {
+        try {
+          const res = await fetch(url, { cache: 'no-cache' });
+          if (res.ok || res.type === 'opaque') {
+            await cache.put(url, res);
           }
-        });
-        await Promise.allSettled(cachePromises);
-      })
-      .then(() => self.skipWaiting())
+        } catch (err) {
+          console.warn(`[SW] Pre-caching skipped: ${url}`);
+        }
+      });
+      await Promise.allSettled(cachePromises);
+    })
   );
 });
 
-// Activate Event: Deletes obsolete caches
+// Activate: Delete ALL outdated caches immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((name) => {
-            if (name !== CACHE_NAME) {
-              return caches.delete(name);
-            }
-          })
-        );
-      })
-      .then(() => self.clients.claim())
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            console.log(`[SW] Purging old cache: ${key}`);
+            return caches.delete(key);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
-// Fetch Event: Cache First, Network Fallback
+// Fetch: Network-First for local files, Cache-First for CDNs
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // Never intercept or cache non-GET requests or internal blob/data URLs
   if (req.method !== 'GET' || req.url.startsWith('blob:') || req.url.startsWith('data:')) {
     return;
   }
 
-  event.respondWith(
-    caches.match(req).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+  const url = new URL(req.url);
+  const isSameOrigin = url.origin === self.location.origin;
 
-      // If not in cache, fetch from network and dynamically cache same-origin assets or trusted CDN scripts
-      return fetch(req)
+  if (isSameOrigin) {
+    // Network-First: Always load the freshest code when online
+    event.respondWith(
+      fetch(req, { cache: 'no-cache' })
         .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200) {
-            return networkResponse;
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
           }
-
-          // Cache valid responses for app assets or external CDN library
-          const isSameOrigin = req.url.startsWith(self.location.origin);
-          const isPdfLibCdn = req.url.includes('cdn.jsdelivr.net/npm/pdf-lib');
-
-          if (isSameOrigin || isPdfLibCdn) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(req, responseToCache);
-            });
-          }
-
           return networkResponse;
         })
         .catch(() => {
-          // If offline and request is an HTML page navigation, fallback to index.html
-          if (req.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
-          // Do not return HTML for scripts or icons
-          return new Response('Network error occurred while offline', {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: new Headers({ 'Content-Type': 'text/plain' })
+          // If offline, use cache
+          return caches.match(req).then((cached) => {
+            if (cached) return cached;
+            if (req.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+            return new Response('Offline: resource unavailable', { status: 503 });
           });
-        });
+        })
+    );
+    return;
+  }
+
+  // Cache-First for external library CDNs
+  event.respondWith(
+    caches.match(req).then((cached) => {
+      if (cached) return cached;
+      return fetch(req).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+        }
+        return networkResponse;
+      });
     })
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
