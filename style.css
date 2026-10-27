@@ -1,13 +1,23 @@
 /* ==========================================================================
-   CSS Variables & Design Tokens
+   Base Reset & Priority Fixes
    ========================================================================== */
+[hidden] {
+  display: none !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --color-primary: #0f172a;        /* Dark navy */
   --color-primary-light: #1e293b;
-  --color-accent: #2563eb;         /* Vibrant blue */
+  --color-accent: #2563eb;         /* Blue accent */
   --color-accent-hover: #1d4ed8;
   --color-accent-subtle: #eff6ff;
-  --color-bg: #f8fafc;            /* Clean light background */
+  --color-bg: #f8fafc;
   --color-surface: #ffffff;
   --color-border: #e2e8f0;
   --color-border-hover: #cbd5e1;
@@ -43,15 +53,6 @@
   --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==========================================================================
-   Base & Reset
-   ========================================================================== */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 html, body {
   min-height: 100%;
 }
@@ -62,10 +63,8 @@ body {
   color: var(--color-text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Layout */
 .app-layout {
   min-height: 100vh;
   display: flex;
@@ -83,7 +82,6 @@ body {
   gap: 1.5rem;
 }
 
-/* Accessibility */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -97,7 +95,7 @@ body {
 }
 
 /* ==========================================================================
-   Header
+   Header & Version Badge
    ========================================================================== */
 .app-header {
   background-color: var(--color-primary);
@@ -141,11 +139,28 @@ body {
   stroke: #60a5fa;
 }
 
+.title-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .brand-text h1 {
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #ffffff;
+}
+
+.version-badge {
+  background-color: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
 }
 
 .brand-text p {
@@ -199,47 +214,28 @@ body {
 }
 
 /* ==========================================================================
-   Cards & Surfaces
+   Update Banner & Alerts
    ========================================================================== */
-.card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 1.5rem;
-  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
-}
-
-.card:hover {
-  border-color: var(--color-border-hover);
-}
-
-.card-header {
+.update-banner {
+  background-color: #1e293b;
+  color: #ffffff;
+  border: 1px solid #334155;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
-  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: var(--shadow-md);
+}
+
+.update-text {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  font-size: 0.9rem;
 }
 
-.card-header h2 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--color-text-main);
-  letter-spacing: -0.01em;
-}
-
-.section-subtitle {
-  width: 100%;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin-top: -0.5rem;
-}
-
-/* ==========================================================================
-   Status & Alert Banner
-   ========================================================================== */
 .status-banner {
   display: flex;
   align-items: flex-start;
@@ -301,8 +297,45 @@ body {
 }
 
 /* ==========================================================================
-   Upload Drop Zone
+   Cards & Surfaces
    ========================================================================== */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  transition: border-color var(--transition-fast);
+}
+
+.card:hover {
+  border-color: var(--color-border-hover);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.card-header h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: -0.5rem;
+}
+
+/* Upload Drop Zone */
 .upload-card {
   padding: 0.75rem;
 }
@@ -328,7 +361,6 @@ body {
 .drop-zone.drag-active {
   border-color: var(--color-accent);
   background-color: #dbeafe;
-  transform: scale(0.995);
 }
 
 .file-input {
@@ -358,7 +390,7 @@ body {
   align-items: center;
   justify-content: center;
   color: #475569;
-  transition: transform var(--transition-fast), background-color var(--transition-fast);
+  transition: transform var(--transition-fast);
 }
 
 .drop-zone:hover .drop-icon-wrapper {
@@ -484,7 +516,7 @@ body {
 }
 
 /* ==========================================================================
-   Download Section & Cards
+   Download Grid
    ========================================================================== */
 .download-grid {
   display: grid;
@@ -675,7 +707,7 @@ body {
 }
 
 /* ==========================================================================
-   Instructions Section
+   Instructions
    ========================================================================== */
 .header-icon-inline {
   display: inline-flex;
@@ -762,7 +794,7 @@ body {
 }
 
 /* ==========================================================================
-   Footer
+   Footer & Cache Reset
    ========================================================================== */
 .app-footer {
   background-color: #ffffff;
@@ -777,7 +809,7 @@ body {
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .privacy-note {
@@ -796,7 +828,27 @@ body {
   color: var(--color-success);
 }
 
-.copyright-note {
+.footer-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
   font-size: 0.78rem;
   color: var(--color-text-subtle);
+}
+
+.cache-reset-link {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0;
+}
+
+.cache-reset-link:hover {
+  color: var(--color-accent-hover);
 }
