@@ -1,12 +1,12 @@
 /**
  * Manual Duplex PDF - Application Logic
- * Version: 1.00
+ * Version: 1.01
  */
 
 'use strict';
 
 (function () {
-  const APP_VERSION = '1.00';
+  const APP_VERSION = '1.01';
 
   // Application State
   const state = {
@@ -69,11 +69,12 @@
   async function ensurePdfEngine() {
     if (window.PDFLib) return true;
 
+    // Prioritize local file, then Cloudflare CDN (works across all ISPs)
     const sources = [
       './pdf-lib.min.js',
-      'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js',
-      'https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js'
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js',
+      'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
+      'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'
     ];
 
     for (const src of sources) {
@@ -89,7 +90,7 @@
         });
         if (window.PDFLib) return true;
       } catch {
-        // Try next mirror
+        // Continue to next mirror
       }
     }
     return !!window.PDFLib;
@@ -103,7 +104,7 @@
       throw new Error('Total pages must be a positive integer.');
     }
 
-    // Part A: Odd-numbered pages in ascending order (1, 3, 5, ...) -> 0, 2, 4...
+    // Part A: Odd-numbered pages ascending (1, 3, 5, ...) -> 0, 2, 4...
     const partAIndices = [];
     const partAPageNumbers = [];
     for (let p = 1; p <= totalPages; p += 2) {
@@ -111,7 +112,7 @@
       partAIndices.push(p - 1);
     }
 
-    // Part B: Even-numbered pages in reverse descending order (e.g. 4, 2)
+    // Part B: Even-numbered pages descending (e.g. 4, 2)
     const partBIndices = [];
     const partBPageNumbers = [];
     const maxEven = totalPages % 2 === 0 ? totalPages : totalPages - 1;
@@ -273,10 +274,9 @@
     elements.fileLoadingText.textContent = `Connecting to PDF engine...`;
 
     try {
-      // 1. Ensure library is loaded
       const isReady = await ensurePdfEngine();
       if (!isReady) {
-        throw new Error('The PDF processing engine could not be loaded. Please verify your internet connection.');
+        throw new Error('The PDF processing engine could not be loaded. Please check your internet connection.');
       }
 
       elements.fileLoadingText.textContent = `Reading "${file.name}"...`;
