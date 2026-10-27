@@ -1,6 +1,6 @@
 /**
  * Manual Duplex PDF - Service Worker
- * Version: 1.00
+ * Version: 1.01
  * Anti-Hoarding Strategy:
  *  - Network-First for App Shell (HTML, CSS, JS) -> Always pulls fresh code when online
  *  - Cache-First for external library CDNs
@@ -9,7 +9,7 @@
 
 'use strict';
 
-const SW_VERSION = '1.00';
+const SW_VERSION = '1.01';
 const CACHE_NAME = `duplex-pdf-v${SW_VERSION}`;
 
 const PRECACHE_ASSETS = [
@@ -21,7 +21,7 @@ const PRECACHE_ASSETS = [
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'
 ];
 
 // Install: Activate immediately without waiting
@@ -72,7 +72,7 @@ self.addEventListener('fetch', (event) => {
   const isSameOrigin = url.origin === self.location.origin;
 
   if (isSameOrigin) {
-    // Network-First: Always load the freshest code when online
+    // Network-First: Always load freshest code when online
     event.respondWith(
       fetch(req, { cache: 'no-cache' })
         .then((networkResponse) => {
