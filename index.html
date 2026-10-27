@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  
+  <!-- Anti-cache meta headers -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <meta name="description" content="Print double-sided documents using your single-sided printer by splitting PDFs into front and back stacks locally in your browser." />
   <meta name="theme-color" content="#0f172a" />
   <title>Manual Duplex PDF — Double-Sided Printing Utility</title>
@@ -15,11 +21,23 @@
   <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
 
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="./style.css" />
+  <!-- Stylesheet (version tagged) -->
+  <link rel="stylesheet" href="./style.css?v=1.00" />
 
-  <!-- PDF-Lib Library (Cached by Service Worker for offline use) -->
+  <!-- Primary CDN for PDF-Lib -->
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
+
+  <!-- Automatic Backup CDN Fallbacks -->
+  <script>
+    if (!window.PDFLib) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"><\/script>');
+    }
+  </script>
+  <script>
+    if (!window.PDFLib) {
+      document.write('<script src="https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js"><\/script>');
+    }
+  </script>
 </head>
 <body>
   <div class="app-layout">
@@ -35,7 +53,10 @@
             </svg>
           </div>
           <div class="brand-text">
-            <h1>Manual Duplex PDF</h1>
+            <div class="title-with-badge">
+              <h1>Manual Duplex PDF</h1>
+              <span class="version-badge" id="app-version-badge">v1.00</span>
+            </div>
             <p>Print double-sided documents using your single-sided printer.</p>
           </div>
         </div>
@@ -59,6 +80,17 @@
 
     <!-- Main Content -->
     <main class="app-main">
+      <!-- Update Banner -->
+      <div id="update-banner" class="update-banner" hidden role="alert">
+        <div class="update-text">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+          </svg>
+          <span>A newer version of Manual Duplex PDF is ready!</span>
+        </div>
+        <button id="update-btn" class="btn btn-sm btn-accent">Update Now</button>
+      </div>
+
       <!-- Status Toast / Alert Banner -->
       <div id="status-banner" class="status-banner" role="alert" aria-live="polite" hidden>
         <div class="status-icon" id="status-icon" aria-hidden="true"></div>
@@ -271,12 +303,17 @@
           </svg>
           100% Client-Side Privacy: Your PDF is processed locally on this device. Files are never uploaded to any server.
         </p>
-        <p class="copyright-note">Manual Duplex PDF &bull; Progressive Web App &bull; Offline Capable</p>
+        <div class="footer-bottom-row">
+          <span>Manual Duplex PDF &bull; v1.00 &bull; Offline Capable</span>
+          <button id="force-cache-clear-btn" class="cache-reset-link" title="Wipes all caches and forces a clean reload">
+            Reset Cache / Update App
+          </button>
+        </div>
       </div>
     </footer>
   </div>
 
-  <!-- Application Logic -->
-  <script src="./app.js"></script>
+  <!-- Application Logic (version-tagged) -->
+  <script src="./app.js?v=1.00"></script>
 </body>
 </html>
