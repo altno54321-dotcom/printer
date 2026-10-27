@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded canvas -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGrad)" />
+
+  <!-- Top paper sheet entering printer -->
+  <path d="M160 170 V90 H352 V170 Z" fill="#e2e8f0" opacity="0.95" />
+  <line x1="200" y1="120" x2="312" y2="120" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" />
+  <line x1="200" y1="145" x2="280" y2="145" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round" />
+
+  <!-- Printer Body -->
+  <rect x="100" y="170" width="312" height="150" rx="28" fill="#1e293b" stroke="#334155" stroke-width="6" />
+
+  <!-- Printer Status LED and Button -->
+  <circle cx="370" cy="220" r="10" fill="#38bdf8" />
+  <rect x="330" y="214" width="20" height="12" rx="4" fill="#475569" />
+
+  <!-- Paper exit slot -->
+  <rect x="144" y="270" width="224" height="14" rx="7" fill="#0f172a" />
+
+  <!-- Bottom printed paper stack -->
+  <rect x="148" y="284" width="216" height="136" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="4" />
+  <line x1="184" y1="330" x2="328" y2="330" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" />
+  <line x1="184" y1="360" x2="290" y2="360" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round" />
+
+  <!-- Manual Duplex Flip Indicator Arrows (Curved double-sided arrows) -->
+  <g transform="translate(256, 360)">
+    <!-- Rotating circular loop symbol -->
+    <path d="M -70,-20 C -70,-55 -30,-65 0,-65 C 35,-65 65,-45 65,-10" fill="none" stroke="url(#accentGrad)" stroke-width="12" stroke-linecap="round" />
+    <polygon points="65,-22 80,-5 50,-5" fill="#2563eb" />
+
+    <path d="M 70,10 C 70,45 30,55 0,55 C -35,55 -65,35 -65,0" fill="none" stroke="url(#accentGrad)" stroke-width="12" stroke-linecap="round" />
+    <polygon points="-65,12 -80,-5 -50,-5" fill="#2563eb" />
+  </g>
+</svg>
